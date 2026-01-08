@@ -21,9 +21,7 @@ class _JamaahViewState extends State<JamaahView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Data Jamaah'),
-      ),
+      appBar: AppBar(title: const Text('Data Jamaah')),
       body: FutureBuilder<List<Jamaah>>(
         future: futureJamaah,
         builder: (context, snapshot) {
@@ -40,11 +38,32 @@ class _JamaahViewState extends State<JamaahView> {
           return ListView.builder(
             itemCount: jamaahList.length,
             itemBuilder: (context, index) {
-              return ListTile(
-                leading: const Icon(Icons.person),
-                title: Text(jamaahList[index].nama),
-                subtitle: Text(
-                  'Status aktif: ${jamaahList[index].statusAktif}',
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.person),
+                  title: Text(jamaahList[index].nama),
+                  subtitle: Text('Status: ${jamaahList[index].presensiStatus}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.check, color: Colors.green),
+                        onPressed: () {
+                          setState(() {
+                            jamaahList[index].presensiStatus = 'Hadir';
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.red),
+                        onPressed: () {
+                          setState(() {
+                            jamaahList[index].presensiStatus = 'Izin';
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
