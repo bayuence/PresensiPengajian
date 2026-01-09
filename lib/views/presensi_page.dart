@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../models/presensi_model.dart';
 
 class PresensiPage extends StatefulWidget {
   const PresensiPage({super.key});
@@ -10,20 +11,22 @@ class PresensiPage extends StatefulWidget {
 }
 
 class _PresensiPageState extends State<PresensiPage> {
-  List presensi = [];
+  List<PresensiModel> presensi = [];
   bool loading = true;
 
   Future<void> fetchPresensi() async {
     final url = Uri.parse(
-      "http://localhost/presensi_pengajian/presensi_list.php"
+      "http://localhost/presensi_pengajian/presensi_list.php",
     );
 
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
+      final List list = jsonData['data'];
+
       setState(() {
-        presensi = jsonData['data'];
+        presensi = list.map((e) => PresensiModel.fromJson(e)).toList();
         loading = false;
       });
     } else {
@@ -50,8 +53,8 @@ class _PresensiPageState extends State<PresensiPage> {
               itemBuilder: (context, index) {
                 final item = presensi[index];
                 return ListTile(
-                  title: Text("Jamaah ID: ${item['jamaah_id']}"),
-                  subtitle: Text("Status: ${item['status']}"),
+                  title: Text("Jamaah ID: ${item.jamaahId}"),
+                  subtitle: Text("Status: ${item.status}"),
                 );
               },
             ),
