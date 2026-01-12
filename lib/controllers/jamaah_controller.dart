@@ -24,7 +24,7 @@ class JamaahController {
 
     List<Jamaah> jamaahList = [];
 
-    if (jsonData['result'] == 'success') {
+    if (jsonData['success'] == true) {
       for (var item in jsonData['data']) {
         jamaahList.add(Jamaah.fromJson(item));
       }
