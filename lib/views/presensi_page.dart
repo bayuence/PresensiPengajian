@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import '../controllers/presensi_controller.dart';
 import '../models/presensi_model.dart';
 
 class PresensiPage extends StatefulWidget {
@@ -14,22 +13,14 @@ class _PresensiPageState extends State<PresensiPage> {
   List<PresensiModel> presensi = [];
   bool loading = true;
 
-  Future<void> fetchPresensi() async {
-    final url = Uri.parse(
-      "http://localhost/presensi_pengajian/presensi_list.php",
-    );
-
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      final List list = jsonData['data'];
-
+  Future<void> loadData() async {
+    try {
+      final data = await PresensiController.fetchPresensi();
       setState(() {
-        presensi = list.map((e) => PresensiModel.fromJson(e)).toList();
+        presensi = data;
         loading = false;
       });
-    } else {
+    } catch (e) {
       setState(() {
         loading = false;
       });
@@ -39,7 +30,7 @@ class _PresensiPageState extends State<PresensiPage> {
   @override
   void initState() {
     super.initState();
-    fetchPresensi();
+    loadData();
   }
 
   @override
