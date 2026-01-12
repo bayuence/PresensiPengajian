@@ -53,8 +53,8 @@ class _PresensiPageState extends State<PresensiPage> {
                     vertical: 6,
                   ),
                   child: ListTile(
-                    title: Text("Jamaah ID: ${item.jamaahId}"),
-                    subtitle: Text("Status: ${item.status}"),
+                    title: Text(item.jamaahNama),
+                    subtitle: Text("${item.tanggal} ${item.waktu ?? ''}\nStatus: ${item.status}"),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -64,13 +64,13 @@ class _PresensiPageState extends State<PresensiPage> {
                             color: Colors.green,
                           ),
                           onPressed: () {
-                            submitPresensi(item.jamaahId, "hadir");
+                            submitPresensi(item.jamaahId, "Hadir");
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.cancel, color: Colors.red),
                           onPressed: () {
-                            submitPresensi(item.jamaahId, "izin");
+                            submitPresensi(item.jamaahId, "Izin");
                           },
                         ),
                       ],
