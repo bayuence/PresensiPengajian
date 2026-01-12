@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'views/jamaah_view.dart';
 import 'package:http/http.dart' as http;
 import 'views/presensi_page.dart';
+import 'views/home_page.dart';
+
 
 
 void main() {
@@ -35,7 +37,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       //home: const MyHomePage(title: 'Flutter Demo Home Page'),
-      home: const PresensiPage(),
+      home: const HomePage(),
 
     );
   }
