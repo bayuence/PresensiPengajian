@@ -8,7 +8,7 @@ class PresensiController {
   // AMBIL DATA PRESENSI
 
   static Future<List<PresensiModel>> fetchPresensi() async {
-    final response = await http.get(Uri.parse("$baseUrl/presensi_list.php"));
+    final response = await http.get(Uri.parse("$baseUrl/presensi.php"));
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
@@ -27,13 +27,13 @@ class PresensiController {
     required String status,
   }) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/presensi_input.php"),
+      Uri.parse("$baseUrl/presensi.php"),
       body: {"jamaah_id": jamaahId.toString(), "status": status},
     );
 
     final jsonData = jsonDecode(response.body);
 
-    if (jsonData['result'] != 'success') {
+    if (jsonData['success'] != true) {
       throw Exception("Gagal menyimpan presensi");
     }
   }
