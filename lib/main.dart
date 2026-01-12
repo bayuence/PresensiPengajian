@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'views/jamaah_view.dart';
-import 'package:http/http.dart' as http;
-import 'views/presensi_page.dart';
 import 'views/home_page.dart';
-
-
 
 void main() {
   runApp(const MyApp());
@@ -38,7 +33,6 @@ class MyApp extends StatelessWidget {
       ),
       //home: const MyHomePage(title: 'Flutter Demo Home Page'),
       home: const HomePage(),
-
     );
   }
 }

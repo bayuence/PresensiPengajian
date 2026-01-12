@@ -24,9 +24,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const PresensiPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const PresensiPage()),
                 );
               },
               child: const Text('Presensi Jamaah'),
@@ -39,9 +37,7 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const JamaahView(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const JamaahView()),
                 );
               },
               child: const Text('Data Jamaah'),

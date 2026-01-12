@@ -17,7 +17,7 @@ class JamaahController {
     }
   }
 
-  /// Ambil data jamaah dalam bentuk List<Jamaah>
+  /// Ambil data jamaah dalam bentuk List [Jamaah]
   static Future<List<Jamaah>> fetchJamaahModel() async {
     final String rawData = await fetchJamaahRaw();
     final Map<String, dynamic> jsonData = jsonDecode(rawData);

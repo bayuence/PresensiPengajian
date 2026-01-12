@@ -38,32 +38,12 @@ class _JamaahViewState extends State<JamaahView> {
           return ListView.builder(
             itemCount: jamaahList.length,
             itemBuilder: (context, index) {
+              final jamaah = jamaahList[index];
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.person),
-                  title: Text(jamaahList[index].nama),
-                  subtitle: Text('Status: ${jamaahList[index].presensiStatus}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.check, color: Colors.green),
-                        onPressed: () {
-                          setState(() {
-                            jamaahList[index].presensiStatus = 'Hadir';
-                          });
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
-                        onPressed: () {
-                          setState(() {
-                            jamaahList[index].presensiStatus = 'Izin';
-                          });
-                        },
-                      ),
-                    ],
-                  ),
+                  title: Text(jamaah.nama),
+                  subtitle: Text('ID: ${jamaah.id}'),
                 ),
               );
             },

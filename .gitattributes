@@ -1,0 +1,13 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Dart files
+*.dart text
+
+# Flutter generated files - keep LF
+linux/flutter/** text eol=lf
+macos/Flutter/** text eol=lf
+windows/flutter/** text eol=lf
+
+# Lock files
+pubspec.lock text eol=lf

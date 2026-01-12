@@ -1,6 +1,6 @@
 class PresensiModel {
-  final String id;
-  final String jamaahId;
+  final int id;
+  final int jamaahId;
   final String status;
   final String createdAt;
 
@@ -13,8 +13,8 @@ class PresensiModel {
 
   factory PresensiModel.fromJson(Map<String, dynamic> json) {
     return PresensiModel(
-      id: json['id'].toString(),
-      jamaahId: json['jamaah_id'].toString(),
+      id: int.parse(json['id'].toString()),
+      jamaahId: int.parse(json['jamaah_id'].toString()),
       status: json['status'],
       createdAt: json['created_at'],
     );
