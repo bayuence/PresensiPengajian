@@ -1,22 +1,34 @@
 class PresensiModel {
   final int id;
   final int jamaahId;
+  final String jamaahNama;
+  final String? jamaahFoto;
   final String status;
-  final String createdAt;
+  final String tanggal;
+  final String? waktu;
+  final String? keterangan;
 
   PresensiModel({
     required this.id,
     required this.jamaahId,
+    required this.jamaahNama,
+    this.jamaahFoto,
     required this.status,
-    required this.createdAt,
+    required this.tanggal,
+    this.waktu,
+    this.keterangan,
   });
 
   factory PresensiModel.fromJson(Map<String, dynamic> json) {
     return PresensiModel(
-      id: int.parse(json['id'].toString()),
-      jamaahId: int.parse(json['jamaah_id'].toString()),
+      id: json['id'],
+      jamaahId: json['jamaahId'],
+      jamaahNama: json['jamaahNama'],
+      jamaahFoto: json['jamaahFoto'],
       status: json['status'],
-      createdAt: json['created_at'],
+      tanggal: json['tanggal'],
+      waktu: json['waktu'],
+      keterangan: json['keterangan'],
     );
   }
 }
