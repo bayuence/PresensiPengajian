@@ -42,7 +42,14 @@ class _PresensiPageState extends State<PresensiPage> {
       appBar: AppBar(title: const Text("Presensi Jamaah")),
       body: loading
           ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
+          : presensi.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Belum ada data presensi',
+                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
               itemCount: presensi.length,
               itemBuilder: (context, index) {
                 final item = presensi[index];
