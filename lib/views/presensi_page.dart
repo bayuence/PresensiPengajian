@@ -43,13 +43,13 @@ class _PresensiPageState extends State<PresensiPage> {
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : presensi.isEmpty
-              ? const Center(
-                  child: Text(
-                    'Belum ada data presensi',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                )
-              : ListView.builder(
+          ? const Center(
+              child: Text(
+                'Belum ada data presensi',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            )
+          : ListView.builder(
               itemCount: presensi.length,
               itemBuilder: (context, index) {
                 final item = presensi[index];
