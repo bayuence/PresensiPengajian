@@ -35,6 +35,15 @@ class _JamaahViewState extends State<JamaahView> {
 
           final jamaahList = snapshot.data!;
 
+          if (jamaahList.isEmpty) {
+            return const Center(
+              child: Text(
+                'Belum ada data jamaah',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+            );
+          }
+
           return ListView.builder(
             itemCount: jamaahList.length,
             itemBuilder: (context, index) {

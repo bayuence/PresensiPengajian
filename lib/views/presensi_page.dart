@@ -54,7 +54,9 @@ class _PresensiPageState extends State<PresensiPage> {
                   ),
                   child: ListTile(
                     title: Text(item.jamaahNama),
-                    subtitle: Text("${item.tanggal} ${item.waktu ?? ''}\nStatus: ${item.status}"),
+                    subtitle: Text(
+                      "${item.tanggal} ${item.waktu ?? ''}\nStatus: ${item.status}",
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
