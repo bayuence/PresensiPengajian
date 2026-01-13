@@ -29,9 +29,7 @@ class _JamaahViewState extends State<JamaahView> {
   Future<void> _navigateToForm([Jamaah? jamaah]) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => TambahJamaahPage(jamaah: jamaah),
-      ),
+      MaterialPageRoute(builder: (context) => TambahJamaahPage(jamaah: jamaah)),
     );
 
     if (result == true) {
@@ -64,7 +62,9 @@ class _JamaahViewState extends State<JamaahView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(success ? 'Jamaah berhasil dihapus' : 'Gagal menghapus jamaah'),
+            content: Text(
+              success ? 'Jamaah berhasil dihapus' : 'Gagal menghapus jamaah',
+            ),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
@@ -115,8 +115,11 @@ class _JamaahViewState extends State<JamaahView> {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Colors.blue[100],
-                    backgroundImage: (jamaah.foto != null && jamaah.foto!.isNotEmpty)
-                        ? NetworkImage('http://localhost/presensi_pengajian/uploads/${jamaah.foto}')
+                    backgroundImage:
+                        (jamaah.foto != null && jamaah.foto!.isNotEmpty)
+                        ? NetworkImage(
+                            'http://10.10.10.47/presensi_pengajian/uploads/${jamaah.foto}',
+                          )
                         : null,
                     child: (jamaah.foto == null || jamaah.foto!.isEmpty)
                         ? const Icon(Icons.person, color: Colors.blue)

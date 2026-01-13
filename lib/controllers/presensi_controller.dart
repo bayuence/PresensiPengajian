@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/presensi_model.dart';
 
 class PresensiController {
-  static const String baseUrl = "http://localhost/presensi_pengajian";
+  static const String baseUrl = "http://10.10.10.47/presensi_pengajian";
 
   // AMBIL DATA PRESENSI
 

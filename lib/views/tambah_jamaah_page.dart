@@ -46,12 +46,16 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
         maxWidth: 1024,
         maxHeight: 1024,
         imageQuality: 85,
+        preferredCameraDevice: CameraDevice.rear,
       );
 
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = File(pickedFile.path);
-        });
+      if (pickedFile != null && mounted) {
+        final File imageFile = File(pickedFile.path);
+        if (await imageFile.exists()) {
+          setState(() {
+            _imageFile = imageFile;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -96,6 +100,17 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
 
   Future<void> _simpan() async {
     if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    // Validasi foto wajib diisi untuk mode tambah
+    if (widget.jamaah == null && _imageFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Foto harus diisi!'),
+          backgroundColor: Colors.red,
+        ),
+      );
       return;
     }
 
@@ -182,7 +197,7 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
                         : (_existingPhotoUrl != null &&
                                       _existingPhotoUrl!.isNotEmpty
                                   ? NetworkImage(
-                                      'http://localhost/presensi_pengajian/uploads/$_existingPhotoUrl',
+                                      'http://10.10.10.47/presensi_pengajian/uploads/$_existingPhotoUrl',
                                     )
                                   : null)
                               as ImageProvider?,
@@ -212,7 +227,19 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            // Peringatan foto wajib
+            if (widget.jamaah == null)
+              const Text(
+                '* Foto wajib diisi',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            const SizedBox(height: 16),
 
             // Input Nama
             TextFormField(

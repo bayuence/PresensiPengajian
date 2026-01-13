@@ -5,7 +5,7 @@ import '../models/jamaah.dart';
 
 class JamaahController {
   static const String _baseUrl =
-      'http://localhost/presensi_pengajian/jamaah.php';
+      'http://10.10.10.47/presensi_pengajian/jamaah.php';
 
   /// Ambil data JSON mentah dari API
   static Future<String> fetchJamaahRaw() async {
