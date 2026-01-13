@@ -43,10 +43,12 @@ class JamaahController {
 
       if (foto != null) {
         request.files.add(await http.MultipartFile.fromPath('foto', foto.path));
+        print('Uploading foto: ${foto.path}');
       }
 
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
+      print('Server response: $responseData');
       var jsonData = jsonDecode(responseData);
 
       return jsonData['success'] == true;
