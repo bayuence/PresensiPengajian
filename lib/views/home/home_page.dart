@@ -3,6 +3,9 @@ import '../../services/session_service.dart';
 import '../../models/account_user.dart';
 import '../../controllers/jamaah_controller.dart';
 import '../../controllers/presensi_controller.dart';
+import 'input_presensi_cepat.dart';
+import 'tambah_jamaah_cepat.dart';
+import 'riwayat_presensi_cepat.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -204,11 +207,49 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(child: _buildQuickAction(icon: Icons.add_circle_outline, label: 'Input\nPresensi', color: const Color(0xFF2E7D32), onTap: () {})),
+                          Expanded(
+                            child: _buildQuickAction(
+                              icon: Icons.add_circle_outline,
+                              label: 'Input\nPresensi',
+                              color: const Color(0xFF2E7D32),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const InputPresensiCepat(),
+                                ).then((_) => _loadData()); // Refresh data after dialog close
+                              },
+                            ),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(child: _buildQuickAction(icon: Icons.person_add_outlined, label: 'Tambah\nJamaah', color: const Color(0xFF1976D2), onTap: () {})),
+                          Expanded(
+                            child: _buildQuickAction(
+                              icon: Icons.person_add_outlined,
+                              label: 'Tambah\nJamaah',
+                              color: const Color(0xFF1976D2),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const TambahJamaahCepat(),
+                                ).then((result) {
+                                  if (result == true) _loadData(); // Refresh if saved
+                                });
+                              },
+                            ),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(child: _buildQuickAction(icon: Icons.history, label: 'Riwayat\nPresensi', color: const Color(0xFFF57C00), onTap: () {})),
+                          Expanded(
+                            child: _buildQuickAction(
+                              icon: Icons.history,
+                              label: 'Riwayat\nPresensi',
+                              color: const Color(0xFFF57C00),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const RiwayatPresensiCepat(),
+                                );
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ],
