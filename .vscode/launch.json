@@ -2,6 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Flutter: BlueStacks",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "deviceId": "localhost:5555",
+            "preLaunchTask": "Connect BlueStacks"
+        },
+        {
             "name": "Flutter: Run (Debug)",
             "request": "launch",
             "type": "dart",
