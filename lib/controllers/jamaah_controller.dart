@@ -2,14 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/jamaah.dart';
+import '../config/api.dart';
 
 class JamaahController {
-  static const String _baseUrl =
-      'http://10.10.10.47/presensi_pengajian/jamaah.php';
-
   /// Ambil data JSON mentah dari API
   static Future<String> fetchJamaahRaw() async {
-    final response = await http.get(Uri.parse(_baseUrl));
+    final response = await http.get(Uri.parse(Api.jamaah));
 
     if (response.statusCode == 200) {
       return response.body;
@@ -37,7 +35,7 @@ class JamaahController {
   /// Tambah jamaah baru dengan foto (opsional)
   Future<bool> addJamaah({required String nama, File? foto}) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(_baseUrl));
+      var request = http.MultipartRequest('POST', Uri.parse(Api.jamaah));
 
       request.fields['nama'] = nama;
 
@@ -65,7 +63,7 @@ class JamaahController {
     File? foto,
   }) async {
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(_baseUrl));
+      var request = http.MultipartRequest('POST', Uri.parse(Api.jamaah));
 
       request.fields['id'] = id.toString();
       request.fields['nama'] = nama;
@@ -90,8 +88,8 @@ class JamaahController {
   Future<bool> deleteJamaah(int id) async {
     try {
       final response = await http.delete(
-        Uri.parse(_baseUrl),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse(Api.jamaah),
+        headers: Api.jsonHeaders,
         body: jsonEncode({'id': id}),
       );
 

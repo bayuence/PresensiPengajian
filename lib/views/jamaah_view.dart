@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/jamaah_controller.dart';
 import '../models/jamaah.dart';
+import '../config/api.dart';
 import 'tambah_jamaah_page.dart';
 
 class JamaahView extends StatefulWidget {
@@ -126,7 +127,7 @@ class _JamaahViewState extends State<JamaahView> {
                     backgroundImage:
                         (jamaah.foto != null && jamaah.foto!.isNotEmpty)
                         ? NetworkImage(
-                            'http://10.10.10.47/presensi_pengajian/uploads/${jamaah.foto}',
+                            Api.uploadUrl(jamaah.foto!),
                           )
                         : null,
                     child: (jamaah.foto == null || jamaah.foto!.isEmpty)

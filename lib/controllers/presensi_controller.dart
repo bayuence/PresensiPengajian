@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/presensi_jamaah.dart';
+import '../config/api.dart';
 
 class PresensiController {
-  static const String baseUrl = "http://10.10.10.47/presensi_pengajian";
-
   // ========== SESI FUNCTIONS ==========
 
   // GET - Ambil list sesi hari ini
   static Future<List<SesiPresensi>> fetchSesiList({String? tanggal}) async {
     final tgl = tanggal ?? DateTime.now().toString().substring(0, 10);
     final response = await http.get(
-      Uri.parse("$baseUrl/presensi.php?action=sesi&tanggal=$tgl"),
+      Uri.parse("${Api.presensi}?action=sesi&tanggal=$tgl"),
     );
 
     if (response.statusCode == 200) {
@@ -28,7 +27,7 @@ class PresensiController {
   static Future<int> mulaiSesi({required String namaPengajian}) async {
     final now = DateTime.now();
     final response = await http.post(
-      Uri.parse("$baseUrl/presensi.php?action=mulai"),
+      Uri.parse("${Api.presensi}?action=mulai"),
       body: {
         "nama_pengajian": namaPengajian,
         "tanggal": now.toString().substring(0, 10),
@@ -47,7 +46,7 @@ class PresensiController {
   // POST - Akhiri sesi
   static Future<void> akhiriSesi({required int sesiId}) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/presensi.php?action=akhiri"),
+      Uri.parse("${Api.presensi}?action=akhiri"),
       body: {"sesi_id": sesiId.toString()},
     );
 
@@ -64,7 +63,7 @@ class PresensiController {
     required int sesiId,
   }) async {
     final response = await http.get(
-      Uri.parse("$baseUrl/presensi.php?action=detail&sesi_id=$sesiId"),
+      Uri.parse("${Api.presensi}?action=detail&sesi_id=$sesiId"),
     );
 
     if (response.statusCode == 200) {
@@ -85,7 +84,7 @@ class PresensiController {
   }) async {
     final now = DateTime.now();
     final response = await http.post(
-      Uri.parse("$baseUrl/presensi.php"),
+      Uri.parse(Api.presensi),
       body: {
         "sesi_id": sesiId.toString(),
         "jamaah_id": jamaahId.toString(),
@@ -105,7 +104,7 @@ class PresensiController {
   // ========== LEGACY (untuk kompatibilitas) ==========
 
   static Future<List<PresensiModel>> fetchPresensi() async {
-    final response = await http.get(Uri.parse("$baseUrl/presensi.php"));
+    final response = await http.get(Uri.parse(Api.presensi));
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);

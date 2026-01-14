@@ -1,17 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/account_user.dart';
+import '../config/api.dart';
 
 class AuthController {
-  static const String baseUrl = "http://10.10.10.47/presensi_pengajian";
-
   // Login
   static Future<AccountUser> login({
     required String username,
     required String password,
   }) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/auth.php?action=login"),
+      Uri.parse("${Api.auth}?action=login"),
       body: {"username": username, "password": password},
     );
 
@@ -28,7 +27,7 @@ class AuthController {
   static Future<AccountUser?> checkUser({required int userId}) async {
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/auth.php?action=check&user_id=$userId"),
+        Uri.parse("${Api.auth}?action=check&user_id=$userId"),
       );
 
       final jsonData = jsonDecode(response.body);
