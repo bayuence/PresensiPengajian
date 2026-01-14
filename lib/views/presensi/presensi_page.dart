@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../controllers/presensi_controller.dart';
-import '../models/presensi_jamaah.dart';
+import '../../controllers/presensi_controller.dart';
+import '../../models/presensi_jamaah.dart';
 import 'input_presensi_page.dart';
 
 class PresensiPage extends StatefulWidget {
@@ -50,7 +50,6 @@ class _PresensiPageState extends State<PresensiPage> {
       try {
         final sesiId = await PresensiController.mulaiSesi(namaPengajian: nama);
         if (mounted) {
-          // Langsung ke halaman input presensi
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -89,18 +88,11 @@ class _PresensiPageState extends State<PresensiPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.red,
-                    ),
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
                     const SizedBox(height: 16),
                     Text(error!, textAlign: TextAlign.center),
                     const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: loadSesi,
-                      child: const Text("Coba Lagi"),
-                    ),
+                    ElevatedButton(onPressed: loadSesi, child: const Text("Coba Lagi")),
                   ],
                 ),
               )
@@ -123,15 +115,9 @@ class _PresensiPageState extends State<PresensiPage> {
           children: [
             Icon(Icons.event_note, size: 80, color: Colors.grey[400]),
             const SizedBox(height: 16),
-            Text(
-              'Belum ada sesi presensi hari ini',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
+            Text('Belum ada sesi presensi hari ini', style: TextStyle(fontSize: 16, color: Colors.grey[600])),
             const SizedBox(height: 8),
-            Text(
-              'Tekan tombol "Mulai Presensi" untuk memulai',
-              style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-            ),
+            Text('Tekan tombol "Mulai Presensi" untuk memulai', style: TextStyle(fontSize: 14, color: Colors.grey[500])),
           ],
         ),
       );
@@ -147,12 +133,7 @@ class _PresensiPageState extends State<PresensiPage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => InputPresensiPage(
-                  sesiId: sesi.id,
-                  namaSesi: sesi.namaPengajian,
-                ),
-              ),
+              MaterialPageRoute(builder: (_) => InputPresensiPage(sesiId: sesi.id, namaSesi: sesi.namaPengajian)),
             ).then((_) => loadSesi());
           },
           onAkhiri: sesi.isBerlangsung ? () => _akhiriSesi(sesi) : null,
@@ -166,19 +147,10 @@ class _PresensiPageState extends State<PresensiPage> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Akhiri Sesi?"),
-        content: Text(
-          "Jamaah yang belum presensi di sesi '${sesi.namaPengajian}' akan otomatis ditandai 'Tidak Hadir'.\n\nYakin ingin mengakhiri sesi ini?",
-        ),
+        content: Text("Jamaah yang belum presensi di sesi '${sesi.namaPengajian}' akan otomatis ditandai 'Tidak Hadir'.\n\nYakin ingin mengakhiri sesi ini?"),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("Batal"),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text("Akhiri"),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Batal")),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), style: ElevatedButton.styleFrom(backgroundColor: Colors.red), child: const Text("Akhiri")),
         ],
       ),
     );
@@ -187,26 +159,18 @@ class _PresensiPageState extends State<PresensiPage> {
       try {
         await PresensiController.akhiriSesi(sesiId: sesi.id);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Sesi berhasil diakhiri'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sesi berhasil diakhiri'), backgroundColor: Colors.green));
           loadSesi();
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red),
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red));
         }
       }
     }
   }
 }
 
-// ========== DIALOG NAMA SESI ==========
 class _DialogNamaSesi extends StatefulWidget {
   @override
   State<_DialogNamaSesi> createState() => _DialogNamaSesiState();
@@ -227,19 +191,12 @@ class _DialogNamaSesiState extends State<_DialogNamaSesi> {
       title: const Text("Mulai Presensi Baru"),
       content: TextField(
         controller: _controller,
-        decoration: const InputDecoration(
-          labelText: "Nama Pengajian",
-          hintText: "Contoh: Kajian Fiqih",
-          border: OutlineInputBorder(),
-        ),
+        decoration: const InputDecoration(labelText: "Nama Pengajian", hintText: "Contoh: Kajian Fiqih", border: OutlineInputBorder()),
         autofocus: true,
         textCapitalization: TextCapitalization.words,
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Batal"),
-        ),
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text("Batal")),
         ElevatedButton(
           onPressed: () {
             if (_controller.text.trim().isNotEmpty) {
@@ -253,7 +210,6 @@ class _DialogNamaSesiState extends State<_DialogNamaSesi> {
   }
 }
 
-// ========== SESI CARD ==========
 class _SesiCard extends StatelessWidget {
   final SesiPresensi sesi;
   final VoidCallback onTap;
@@ -275,98 +231,43 @@ class _SesiCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      sesi.namaPengajian,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  Expanded(child: Text(sesi.namaPengajian, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isBerlangsung ? Colors.green : Colors.grey,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      isBerlangsung ? "Berlangsung" : "Selesai",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(color: isBerlangsung ? Colors.green : Colors.grey, borderRadius: BorderRadius.circular(20)),
+                    child: Text(isBerlangsung ? "Berlangsung" : "Selesai", style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
-
-              // Waktu
               Row(
                 children: [
                   const Icon(Icons.access_time, size: 16, color: Colors.grey),
                   const SizedBox(width: 4),
-                  Text(
-                    "Mulai: ${sesi.waktuMulai}",
-                    style: TextStyle(color: Colors.grey[600]),
-                  ),
+                  Text("Mulai: ${sesi.waktuMulai}", style: TextStyle(color: Colors.grey[600])),
                   if (sesi.waktuSelesai != null) ...[
                     const SizedBox(width: 16),
-                    Text(
-                      "Selesai: ${sesi.waktuSelesai}",
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
+                    Text("Selesai: ${sesi.waktuSelesai}", style: TextStyle(color: Colors.grey[600])),
                   ],
                 ],
               ),
               const SizedBox(height: 12),
-
-              // Statistik + Tombol Akhiri
               Row(
                 children: [
-                  _StatChip(
-                    icon: Icons.check_circle,
-                    label: "Hadir",
-                    count: sesi.jumlahHadir,
-                    color: Colors.green,
-                  ),
+                  _StatChip(icon: Icons.check_circle, label: "Hadir", count: sesi.jumlahHadir, color: Colors.green),
                   const SizedBox(width: 8),
-                  _StatChip(
-                    icon: Icons.info,
-                    label: "Izin",
-                    count: sesi.jumlahIzin,
-                    color: Colors.orange,
-                  ),
+                  _StatChip(icon: Icons.info, label: "Izin", count: sesi.jumlahIzin, color: Colors.orange),
                   const SizedBox(width: 8),
-                  _StatChip(
-                    icon: Icons.cancel,
-                    label: "Tidak Hadir",
-                    count: sesi.jumlahTidakHadir,
-                    color: Colors.red,
-                  ),
+                  _StatChip(icon: Icons.cancel, label: "Tidak Hadir", count: sesi.jumlahTidakHadir, color: Colors.red),
                   const Spacer(),
-                  // Tombol Akhiri
                   if (onAkhiri != null)
                     ElevatedButton.icon(
                       onPressed: onAkhiri,
                       icon: const Icon(Icons.stop_circle, size: 18),
                       label: const Text("Akhiri"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8)),
                     ),
                 ],
               ),
@@ -384,30 +285,19 @@ class _StatChip extends StatelessWidget {
   final int count;
   final Color color;
 
-  const _StatChip({
-    required this.icon,
-    required this.label,
-    required this.count,
-    required this.color,
-  });
+  const _StatChip({required this.icon, required this.label, required this.count, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 4),
-          Text(
-            "$count",
-            style: TextStyle(color: color, fontWeight: FontWeight.bold),
-          ),
+          Text("$count", style: TextStyle(color: color, fontWeight: FontWeight.bold)),
         ],
       ),
     );

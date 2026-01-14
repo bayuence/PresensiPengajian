@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'presensi_page.dart';
-import 'jamaah_view.dart';
-import 'profil_page.dart';
+import 'home/home_page.dart';
+import 'presensi/presensi_page.dart';
+import 'jamaah/jamaah_view.dart';
+import 'profil/profil_page.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});

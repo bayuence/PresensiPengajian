@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'views/main_navigation.dart';
-import 'views/login_page.dart';
+import 'views/auth/login_page.dart';
 import 'services/session_service.dart';
 
 void main() {

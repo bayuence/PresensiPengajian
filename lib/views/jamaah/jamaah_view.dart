@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../controllers/jamaah_controller.dart';
-import '../models/jamaah.dart';
-import '../config/api.dart';
+import '../../controllers/jamaah_controller.dart';
+import '../../models/jamaah.dart';
+import '../../config/api.dart';
 import 'tambah_jamaah_page.dart';
 
 class JamaahView extends StatefulWidget {
@@ -34,7 +34,7 @@ class _JamaahViewState extends State<JamaahView> {
     );
 
     if (result == true) {
-      _loadData(); // Refresh list
+      _loadData();
     }
   }
 
@@ -45,10 +45,7 @@ class _JamaahViewState extends State<JamaahView> {
         title: const Text('Konfirmasi'),
         content: Text('Hapus jamaah ${jamaah.nama}?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Batal'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Batal')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -63,9 +60,7 @@ class _JamaahViewState extends State<JamaahView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              success ? 'Jamaah berhasil dihapus' : 'Gagal menghapus jamaah',
-            ),
+            content: Text(success ? 'Jamaah berhasil dihapus' : 'Gagal menghapus jamaah'),
             backgroundColor: success ? Colors.green : Colors.red,
           ),
         );
@@ -108,10 +103,7 @@ class _JamaahViewState extends State<JamaahView> {
 
           if (jamaahList.isEmpty) {
             return const Center(
-              child: Text(
-                'Belum ada data jamaah',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+              child: Text('Belum ada data jamaah', style: TextStyle(fontSize: 16, color: Colors.grey)),
             );
           }
 
@@ -124,34 +116,20 @@ class _JamaahViewState extends State<JamaahView> {
                 child: ListTile(
                   leading: CircleAvatar(
                     backgroundColor: Colors.blue[100],
-                    backgroundImage:
-                        (jamaah.foto != null && jamaah.foto!.isNotEmpty)
-                        ? NetworkImage(
-                            Api.uploadUrl(jamaah.foto!),
-                          )
+                    backgroundImage: (jamaah.foto != null && jamaah.foto!.isNotEmpty)
+                        ? NetworkImage(Api.uploadUrl(jamaah.foto!))
                         : null,
                     child: (jamaah.foto == null || jamaah.foto!.isEmpty)
                         ? const Icon(Icons.person, color: Colors.blue)
                         : null,
                   ),
-                  title: Text(
-                    jamaah.nama,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  title: Text(jamaah.nama, style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('ID: ${jamaah.id}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _navigateToForm(jamaah),
-                        tooltip: 'Edit',
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _confirmDelete(jamaah),
-                        tooltip: 'Hapus',
-                      ),
+                      IconButton(icon: const Icon(Icons.edit, color: Colors.blue), onPressed: () => _navigateToForm(jamaah), tooltip: 'Edit'),
+                      IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => _confirmDelete(jamaah), tooltip: 'Hapus'),
                     ],
                   ),
                 ),

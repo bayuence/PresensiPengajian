@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../services/session_service.dart';
-import '../models/account_user.dart';
-import '../controllers/jamaah_controller.dart';
-import '../controllers/presensi_controller.dart';
+import '../../services/session_service.dart';
+import '../../models/account_user.dart';
+import '../../controllers/jamaah_controller.dart';
+import '../../controllers/presensi_controller.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,13 +29,9 @@ class _HomePageState extends State<HomePage> {
     });
     
     try {
-      // Load user
       final user = await SessionService.getUser();
-      
-      // Load total jamaah
       final jamaahList = await JamaahController.fetchJamaahModel();
       
-      // Load presensi hari ini
       int hadirHariIni = 0;
       try {
         final sesiList = await PresensiController.fetchSesiList();
@@ -43,7 +39,6 @@ class _HomePageState extends State<HomePage> {
           hadirHariIni += sesi.jumlahHadir;
         }
       } catch (e) {
-        // Jika tidak ada sesi hari ini, hadir = 0
         hadirHariIni = 0;
       }
       
@@ -76,7 +71,6 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with greeting
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -84,10 +78,7 @@ class _HomePageState extends State<HomePage> {
                     gradient: LinearGradient(
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFF2E7D32),
-                        Color(0xFF43A047),
-                      ],
+                      colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
                     ),
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(24),
@@ -165,30 +156,19 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      // Date display
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.calendar_today,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+                            const Icon(Icons.calendar_today, color: Colors.white, size: 20),
                             const SizedBox(width: 10),
                             Text(
                               _getFormattedDate(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
                             ),
                           ],
                         ),
@@ -196,109 +176,45 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Quick Stats Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Ringkasan',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF333333),
-                        ),
-                      ),
+                      const Text('Ringkasan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF333333))),
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(
-                            child: _buildStatCard(
-                              icon: Icons.people,
-                              title: 'Total Jamaah',
-                              value: _isLoading ? '...' : '$_totalJamaah',
-                              color: const Color(0xFF2196F3),
-                            ),
-                          ),
+                          Expanded(child: _buildStatCard(icon: Icons.people, title: 'Total Jamaah', value: _isLoading ? '...' : '$_totalJamaah', color: const Color(0xFF2196F3))),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildStatCard(
-                              icon: Icons.check_circle,
-                              title: 'Hadir Hari Ini',
-                              value: _isLoading ? '...' : '$_hadirHariIni',
-                              color: const Color(0xFF4CAF50),
-                            ),
-                          ),
+                          Expanded(child: _buildStatCard(icon: Icons.check_circle, title: 'Hadir Hari Ini', value: _isLoading ? '...' : '$_hadirHariIni', color: const Color(0xFF4CAF50))),
                         ],
                       ),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Menu Cepat Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Menu Cepat',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF333333),
-                        ),
-                      ),
+                      const Text('Menu Cepat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF333333))),
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(
-                            child: _buildQuickAction(
-                              icon: Icons.add_circle_outline,
-                              label: 'Input\nPresensi',
-                              color: const Color(0xFF2E7D32),
-                              onTap: () {
-                                // Navigate will be handled by bottom nav
-                              },
-                            ),
-                          ),
+                          Expanded(child: _buildQuickAction(icon: Icons.add_circle_outline, label: 'Input\nPresensi', color: const Color(0xFF2E7D32), onTap: () {})),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildQuickAction(
-                              icon: Icons.person_add_outlined,
-                              label: 'Tambah\nJamaah',
-                              color: const Color(0xFF1976D2),
-                              onTap: () {
-                                // Navigate will be handled by bottom nav
-                              },
-                            ),
-                          ),
+                          Expanded(child: _buildQuickAction(icon: Icons.person_add_outlined, label: 'Tambah\nJamaah', color: const Color(0xFF1976D2), onTap: () {})),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildQuickAction(
-                              icon: Icons.history,
-                              label: 'Riwayat\nPresensi',
-                              color: const Color(0xFFF57C00),
-                              onTap: () {
-                                // Navigate will be handled by bottom nav
-                              },
-                            ),
-                          ),
+                          Expanded(child: _buildQuickAction(icon: Icons.history, label: 'Riwayat\nPresensi', color: const Color(0xFFF57C00), onTap: () {})),
                         ],
                       ),
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 24),
-
-                // Info Card
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Container(
@@ -308,51 +224,26 @@ class _HomePageState extends State<HomePage> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xFF2E7D32).withOpacity(0.1),
-                          const Color(0xFF43A047).withOpacity(0.05),
-                        ],
+                        colors: [const Color(0xFF2E7D32).withOpacity(0.1), const Color(0xFF43A047).withOpacity(0.05)],
                       ),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: const Color(0xFF2E7D32).withOpacity(0.2),
-                      ),
+                      border: Border.all(color: const Color(0xFF2E7D32).withOpacity(0.2)),
                     ),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2E7D32).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.mosque,
-                            color: Color(0xFF2E7D32),
-                            size: 28,
-                          ),
+                          decoration: BoxDecoration(color: const Color(0xFF2E7D32).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                          child: const Icon(Icons.mosque, color: Color(0xFF2E7D32), size: 28),
                         ),
                         const SizedBox(width: 16),
                         const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Presensi Pengajian',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFF2E7D32),
-                                ),
-                              ),
+                              Text('Presensi Pengajian', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF2E7D32))),
                               SizedBox(height: 4),
-                              Text(
-                                'Kelola kehadiran jamaah dengan mudah dan efisien',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF666666),
-                                ),
-                              ),
+                              Text('Kelola kehadiran jamaah dengan mudah dan efisien', style: TextStyle(fontSize: 12, color: Color(0xFF666666))),
                             ],
                           ),
                         ),
@@ -360,7 +251,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 24),
               ],
             ),
@@ -372,85 +262,41 @@ class _HomePageState extends State<HomePage> {
 
   String _getGreeting() {
     final hour = DateTime.now().hour;
-    if (hour < 12) {
-      return 'Selamat Pagi 👋';
-    } else if (hour < 15) {
-      return 'Selamat Siang 👋';
-    } else if (hour < 18) {
-      return 'Selamat Sore 👋';
-    } else {
-      return 'Selamat Malam 👋';
-    }
+    if (hour < 12) return 'Selamat Pagi 👋';
+    if (hour < 15) return 'Selamat Siang 👋';
+    if (hour < 18) return 'Selamat Sore 👋';
+    return 'Selamat Malam 👋';
   }
 
   String _getFormattedDate() {
     final now = DateTime.now();
     final days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    final months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-    ];
+    final months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     return '${days[now.weekday % 7]}, ${now.day} ${months[now.month - 1]} ${now.year}';
   }
 
-  Widget _buildStatCard({
-    required IconData icon,
-    required String title,
-    required String value,
-    required Color color,
-  }) {
+  Widget _buildStatCard({required IconData icon, required String title, required String value, required Color color}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
+          Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 20)),
           const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
-          ),
+          Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color)),
           const SizedBox(height: 4),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
+          Text(title, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
         ],
       ),
     );
   }
 
-  Widget _buildQuickAction({
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildQuickAction({required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -459,35 +305,13 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 2))],
         ),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
+            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: Icon(icon, color: color, size: 24)),
             const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-                height: 1.3,
-              ),
-            ),
+            Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: Colors.grey[700], height: 1.3)),
           ],
         ),
       ),
