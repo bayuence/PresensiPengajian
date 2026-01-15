@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../controllers/presensi_controller.dart';
 import '../../models/presensi_jamaah.dart';
-import '../presensi/input_presensi_page.dart';
+import '../presensi/sesi/input_presensi.dart';
 
 class RiwayatPresensiCepat extends StatefulWidget {
   const RiwayatPresensiCepat({super.key});

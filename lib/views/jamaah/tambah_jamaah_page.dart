@@ -148,7 +148,8 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.jamaah == null ? 'Tambah Jamaah' : 'Edit Jamaah'),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF2E7D32),
+        foregroundColor: Colors.white,
       ),
       body: Form(
         key: _formKey,
@@ -174,7 +175,7 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
                     bottom: 0,
                     right: 0,
                     child: CircleAvatar(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: const Color(0xFF2E7D32),
                       radius: 20,
                       child: IconButton(
                         icon: const Icon(Icons.camera_alt, size: 20, color: Colors.white),
@@ -212,7 +213,7 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
             ElevatedButton(
               onPressed: _isLoading ? null : _simpan,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
+                backgroundColor: const Color(0xFF2E7D32),
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
@@ -226,6 +227,58 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
                       widget.jamaah == null ? 'Tambah Jamaah' : 'Update Jamaah',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                     ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: 2, // Jamaah tab
+          onTap: (index) {
+            Navigator.pop(context);
+          },
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: const Color(0xFF2E7D32),
+          unselectedItemColor: Colors.grey[500],
+          selectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
+          ),
+          unselectedLabelStyle: const TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 11,
+          ),
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.fact_check_outlined),
+              activeIcon: Icon(Icons.fact_check),
+              label: 'Presensi',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people_outline),
+              activeIcon: Icon(Icons.people),
+              label: 'Jamaah',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Profil',
             ),
           ],
         ),

@@ -84,8 +84,9 @@ class _JamaahViewState extends State<JamaahView> {
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'jamaah_fab_add',
         onPressed: () => _navigateToForm(),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF2E7D32),
         child: const Icon(Icons.add, color: Colors.white),
       ),
       body: FutureBuilder<List<Jamaah>>(

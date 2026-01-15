@@ -19,6 +19,8 @@ switch ($method) {
             mulaiSesi();
         } else if ($action === 'akhiri') {
             akhiriSesi();
+        } else if ($action === 'hapus') {
+            hapusSesi();
         } else {
             submitPresensi();
         }
@@ -156,6 +158,42 @@ function akhiriSesi() {
     }
     
     $update->close();
+}
+
+// POST - Hapus sesi presensi
+function hapusSesi() {
+    global $conn;
+    
+    $sesi_id = $_POST['sesi_id'] ?? 0;
+    
+    if (empty($sesi_id)) {
+        echo json_encode(['success' => false, 'message' => 'Sesi ID harus diisi']);
+        return;
+    }
+    
+    // Hapus semua presensi yang terkait dengan sesi ini
+    $deletePresensi = $conn->prepare("DELETE FROM presensi WHERE sesi_id = ?");
+    $deletePresensi->bind_param("i", $sesi_id);
+    $deletePresensi->execute();
+    $deletePresensi->close();
+    
+    // Hapus sesi
+    $deleteSesi = $conn->prepare("DELETE FROM sesi_presensi WHERE id = ?");
+    $deleteSesi->bind_param("i", $sesi_id);
+    
+    if ($deleteSesi->execute()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Sesi berhasil dihapus'
+        ]);
+    } else {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Gagal menghapus sesi: ' . $conn->error
+        ]);
+    }
+    
+    $deleteSesi->close();
 }
 
 // ========== PRESENSI FUNCTIONS ==========
