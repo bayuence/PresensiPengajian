@@ -101,7 +101,7 @@ function addJamaah() {
 function updateJamaah() {
     global $conn;
     
-    // Ambil dari $_POST karena dikirim via multipart/form-data
+    // Ambil dari POST karena dikirim via multipart/form-data
     $id = $_POST['id'] ?? 0;
     $nama = $_POST['nama'] ?? '';
     

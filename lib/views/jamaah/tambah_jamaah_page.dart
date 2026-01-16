@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/jamaah.dart';
@@ -110,11 +111,33 @@ class _TambahJamaahPageState extends State<TambahJamaahPage> {
 
     try {
       bool success;
+      
+      // Convert File to bytes if image is selected
+      Uint8List? fotoBytes;
+      String? fotoName;
+      
+      if (_imageFile != null) {
+        fotoBytes = await _imageFile!.readAsBytes();
+        fotoName = _imageFile!.path.split('/').last;
+        // Handle Windows path separator
+        if (fotoName.contains('\\')) {
+          fotoName = fotoName.split('\\').last;
+        }
+      }
 
       if (widget.jamaah == null) {
-        success = await _jamaahController.addJamaah(nama: _namaController.text, foto: _imageFile);
+        success = await _jamaahController.addJamaah(
+          nama: _namaController.text, 
+          fotoBytes: fotoBytes,
+          fotoName: fotoName,
+        );
       } else {
-        success = await _jamaahController.updateJamaah(id: widget.jamaah!.id, nama: _namaController.text, foto: _imageFile);
+        success = await _jamaahController.updateJamaah(
+          id: widget.jamaah!.id, 
+          nama: _namaController.text, 
+          fotoBytes: fotoBytes,
+          fotoName: fotoName,
+        );
       }
 
       if (mounted) {

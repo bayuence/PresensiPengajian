@@ -720,7 +720,7 @@ class _PresensiPageState extends State<PresensiPage> with TickerProviderStateMix
   }
 }
 
-// ==================== WIDGETS ====================
+// WIDGETS
 
 class _MainTabButton extends StatelessWidget {
   final IconData icon;

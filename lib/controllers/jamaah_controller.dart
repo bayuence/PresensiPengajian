@@ -1,6 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/jamaah.dart';
 import '../config/api.dart';
 
@@ -32,16 +33,24 @@ class JamaahController {
     return jamaahList;
   }
 
-  /// Tambah jamaah baru dengan foto (opsional)
-  Future<bool> addJamaah({required String nama, File? foto}) async {
+  /// Tambah jamaah baru dengan foto (opsional) - Support Web & Mobile
+  Future<bool> addJamaah({
+    required String nama, 
+    Uint8List? fotoBytes,
+    String? fotoName,
+  }) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse(Api.jamaah));
 
       request.fields['nama'] = nama;
 
-      if (foto != null) {
-        request.files.add(await http.MultipartFile.fromPath('foto', foto.path));
-        print('Uploading foto: ${foto.path}');
+      if (fotoBytes != null && fotoName != null) {
+        request.files.add(http.MultipartFile.fromBytes(
+          'foto',
+          fotoBytes,
+          filename: fotoName,
+        ));
+        print('Uploading foto: $fotoName');
       }
 
       var response = await request.send();
@@ -56,11 +65,12 @@ class JamaahController {
     }
   }
 
-  /// Update jamaah (termasuk foto)
+  /// Update jamaah (termasuk foto) - Support Web & Mobile
   Future<bool> updateJamaah({
     required int id,
     required String nama,
-    File? foto,
+    Uint8List? fotoBytes,
+    String? fotoName,
   }) async {
     try {
       var request = http.MultipartRequest('POST', Uri.parse(Api.jamaah));
@@ -69,8 +79,12 @@ class JamaahController {
       request.fields['nama'] = nama;
       request.fields['_method'] = 'PUT'; // Simulasi PUT method
 
-      if (foto != null) {
-        request.files.add(await http.MultipartFile.fromPath('foto', foto.path));
+      if (fotoBytes != null && fotoName != null) {
+        request.files.add(http.MultipartFile.fromBytes(
+          'foto',
+          fotoBytes,
+          filename: fotoName,
+        ));
       }
 
       var response = await request.send();

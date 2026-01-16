@@ -15,7 +15,7 @@ include 'config.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-// ========== LOGIN ==========
+//LOGIN 
 if ($method === 'POST' && $action === 'login') {
     $username = isset($_POST['username']) ? trim($_POST['username']) : '';
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
@@ -36,7 +36,7 @@ if ($method === 'POST' && $action === 'login') {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
         
-        // Cek password (plain text untuk simple)
+        // Cek password
         if ($password === $user['password']) {
             echo json_encode([
                 "success" => true,
@@ -64,7 +64,7 @@ if ($method === 'POST' && $action === 'login') {
     exit;
 }
 
-// ========== CEK USER (opsional) ==========
+//CEK USER (opsional)
 if ($method === 'GET' && $action === 'check') {
     $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
     

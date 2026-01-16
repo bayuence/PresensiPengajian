@@ -1,4 +1,4 @@
-// ========== PRESENSI MODEL (LEGACY) ==========
+//PRESENSI MODEL (LEGACY)
 class PresensiModel {
   final int id;
   final int jamaahId;
@@ -34,7 +34,7 @@ class PresensiModel {
   }
 }
 
-// ========== SESI PRESENSI ==========
+//SESI PRESENSI
 class SesiPresensi {
   final int id;
   final String namaPengajian;
@@ -76,7 +76,7 @@ class SesiPresensi {
   int get totalJamaah => jumlahHadir + jumlahIzin + jumlahTidakHadir;
 }
 
-// ========== PRESENSI JAMAAH ==========
+// PRESENSI JAMAAH
 class PresensiJamaah {
   final int jamaahId;
   final String nama;

@@ -92,7 +92,7 @@ class PresensiController {
     }
   }
 
-  // ========== PRESENSI FUNCTIONS ==========
+  //PRESENSI FUNCTIONS
 
   // GET - Ambil detail presensi per sesi (list jamaah dengan status)
   static Future<List<PresensiJamaah>> fetchPresensiDetail({
@@ -137,7 +137,7 @@ class PresensiController {
     }
   }
 
-  // ========== LEGACY (untuk kompatibilitas) ==========
+  //LEGACY (untuk kompatibilitas)
 
   static Future<List<PresensiModel>> fetchPresensi() async {
     final response = await http.get(Uri.parse(Api.presensi));
