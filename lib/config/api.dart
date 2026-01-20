@@ -4,7 +4,7 @@ class Api {
  
   // BASE URL - 
 
-  static const String baseUrl = "http://localhost/presensi_pengajian";
+  static const String baseUrl = "http://192.168.1.173/presensi_pengajian";
 
   // ENDPOINTS
  

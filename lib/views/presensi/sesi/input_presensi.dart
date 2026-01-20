@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../controllers/presensi_controller.dart';
 import '../../../models/presensi_jamaah.dart';
 import '../../../config/api.dart';
@@ -8,23 +10,28 @@ class InputPresensiPage extends StatefulWidget {
   final int sesiId;
   final String namaSesi;
 
-  const InputPresensiPage({super.key, required this.sesiId, required this.namaSesi});
+  const InputPresensiPage({
+    super.key,
+    required this.sesiId,
+    required this.namaSesi,
+  });
 
   @override
   State<InputPresensiPage> createState() => _InputPresensiPageState();
 }
 
-class _InputPresensiPageState extends State<InputPresensiPage> with SingleTickerProviderStateMixin {
+class _InputPresensiPageState extends State<InputPresensiPage>
+    with SingleTickerProviderStateMixin {
   List<PresensiJamaah> jamaahList = [];
   bool loading = true;
   bool sesiAktif = true;
   String? error;
-  
+
   // Timer untuk jam realtime
   Timer? _timer;
   DateTime _currentTime = DateTime.now();
   DateTime? _startTime;
-  
+
   // Tab controller
   late TabController _tabController;
 
@@ -64,41 +71,180 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
   }
 
   Future<void> loadData() async {
-    setState(() { loading = true; error = null; });
+    setState(() {
+      loading = true;
+      error = null;
+    });
     try {
-      final data = await PresensiController.fetchPresensiDetail(sesiId: widget.sesiId);
-      setState(() { jamaahList = data; loading = false; });
+      final data = await PresensiController.fetchPresensiDetail(
+        sesiId: widget.sesiId,
+      );
+      setState(() {
+        jamaahList = data;
+        loading = false;
+      });
     } catch (e) {
-      setState(() { error = e.toString(); loading = false; });
+      setState(() {
+        error = e.toString();
+        loading = false;
+      });
     }
   }
 
-  Future<void> _submitPresensi(int jamaahId, String status) async {
+  Future<void> _submitPresensi(
+    int jamaahId,
+    String status, {
+    File? foto,
+  }) async {
     try {
-      await PresensiController.submitPresensi(sesiId: widget.sesiId, jamaahId: jamaahId, status: status);
+      await PresensiController.submitPresensi(
+        sesiId: widget.sesiId,
+        jamaahId: jamaahId,
+        status: status,
+        fotoBukti: foto,
+      );
       loadData();
       if (mounted) {
+        String message = 'Presensi berhasil diperbarui';
+        Color color = Colors.blue;
+        IconData icon = Icons.check_circle;
+
+        if (status == 'Hadir') {
+          message = 'Ditandai Hadir';
+          color = const Color(0xFF2E7D32);
+        } else if (status == 'Izin') {
+          message = 'Ditandai Izin';
+          color = Colors.orange;
+          icon = Icons.info_outline;
+        } else if (status == 'Belum') {
+          message = 'Presensi dibatalkan (Reset)';
+          color = Colors.grey;
+          icon = Icons.refresh;
+        } else if (status == 'Tidak Hadir') {
+          message = 'Ditandai Tidak Hadir';
+          color = Colors.red;
+          icon = Icons.cancel;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                Icon(status == 'Hadir' ? Icons.check_circle : Icons.info_outline, color: Colors.white),
+                Icon(icon, color: Colors.white),
                 const SizedBox(width: 8),
-                Text('Presensi $status berhasil'),
+                Text(message),
               ],
             ),
-            backgroundColor: status == 'Hadir' ? const Color(0xFF2E7D32) : Colors.orange,
+            backgroundColor: color,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
             duration: const Duration(seconds: 1),
           ),
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red),
+        );
       }
     }
+  }
+
+  Future<void> _ambilFotoDanHadir(int jamaahId) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? photo = await picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 50,
+        preferredCameraDevice: CameraDevice.rear,
+      );
+
+      if (photo != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Mengupload foto...'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+        }
+        await _submitPresensi(jamaahId, 'Hadir', foto: File(photo.path));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Gagal membuka kamera: $e')));
+      }
+    }
+  }
+
+  void _showEditOptions(PresensiJamaah jamaah) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Ubah Status: ${jamaah.nama}",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(
+                  Icons.check_circle,
+                  color: Color(0xFF2E7D32),
+                ),
+                title: const Text("Hadir (Foto)"),
+                subtitle: const Text("Ambil foto bukti kehadiran"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _ambilFotoDanHadir(jamaah.jamaahId);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.info, color: Colors.orange),
+                title: const Text("Izin"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _submitPresensi(jamaah.jamaahId, 'Izin');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.cancel, color: Colors.red),
+                title: const Text("Tidak Hadir (Absen)"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _submitPresensi(jamaah.jamaahId, 'Tidak Hadir');
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.restart_alt, color: Colors.grey),
+                title: const Text("Reset ke Belum"),
+                onTap: () {
+                  Navigator.pop(context);
+                  _submitPresensi(jamaah.jamaahId, 'Belum');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _akhiriSesi() async {
@@ -138,11 +284,18 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber, color: Colors.orange, size: 20),
+                  const Icon(
+                    Icons.warning_amber,
+                    color: Colors.orange,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     "${jamaahList.where((j) => j.status == 'Belum').length} jamaah belum dipresensi",
-                    style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Colors.orange,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
@@ -158,7 +311,10 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
             onPressed: () => Navigator.pop(context, true),
             icon: const Icon(Icons.stop, size: 18),
             label: const Text("Akhiri Sesi"),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
           ),
         ],
       ),
@@ -179,15 +335,21 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
               ),
               backgroundColor: Colors.green,
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           );
-          setState(() { sesiAktif = false; });
+          setState(() {
+            sesiAktif = false;
+          });
           loadData();
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red),
+          );
         }
       }
     }
@@ -197,14 +359,21 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
   int get hadir => jamaahList.where((j) => j.status == 'Hadir').length;
   int get izin => jamaahList.where((j) => j.status == 'Izin').length;
   int get belum => jamaahList.where((j) => j.status == 'Belum').length;
-  int get tidakHadir => jamaahList.where((j) => j.status == 'Tidak Hadir').length;
+  int get tidakHadir =>
+      jamaahList.where((j) => j.status == 'Tidak Hadir').length;
 
   List<PresensiJamaah> get filteredList {
     switch (_tabController.index) {
-      case 1: return jamaahList.where((j) => j.status == 'Hadir').toList();
-      case 2: return jamaahList.where((j) => j.status == 'Izin').toList();
-      case 3: return jamaahList.where((j) => j.status == 'Belum' || j.status == 'Tidak Hadir').toList();
-      default: return jamaahList;
+      case 1:
+        return jamaahList.where((j) => j.status == 'Hadir').toList();
+      case 2:
+        return jamaahList.where((j) => j.status == 'Izin').toList();
+      case 3:
+        return jamaahList
+            .where((j) => j.status == 'Belum' || j.status == 'Tidak Hadir')
+            .toList();
+      default:
+        return jamaahList;
     }
   }
 
@@ -220,10 +389,14 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
             _buildTabBar(),
             Expanded(
               child: loading
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFF2E7D32)))
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF2E7D32),
+                      ),
+                    )
                   : error != null
-                      ? _buildError()
-                      : _buildJamaahList(),
+                  ? _buildError()
+                  : _buildJamaahList(),
             ),
           ],
         ),
@@ -321,7 +494,11 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
               children: [
                 Text(
                   widget.namaSesi,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF333333)),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF333333),
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -339,7 +516,10 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
                     const SizedBox(width: 6),
                     Text(
                       sesiAktif ? "Berlangsung" : "Selesai",
-                      style: TextStyle(fontSize: 12, color: sesiAktif ? Colors.green : Colors.grey),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: sesiAktif ? Colors.green : Colors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -359,7 +539,11 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.timer_outlined, color: Colors.white, size: 16),
+                  const Icon(
+                    Icons.timer_outlined,
+                    color: Colors.white,
+                    size: 16,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     _elapsedTime,
@@ -380,7 +564,10 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
               onTap: _akhiriSesi,
               borderRadius: BorderRadius.circular(10),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.red.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(10),
@@ -391,7 +578,14 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
                   children: [
                     Icon(Icons.stop_circle, color: Colors.red, size: 16),
                     SizedBox(width: 4),
-                    Text("Akhiri", style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600, fontSize: 12)),
+                    Text(
+                      "Akhiri",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -407,13 +601,37 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          _StatCard(icon: Icons.check_circle, label: "Hadir", count: hadir, color: const Color(0xFF2E7D32), bgColor: const Color(0xFFE8F5E9)),
+          _StatCard(
+            icon: Icons.check_circle,
+            label: "Hadir",
+            count: hadir,
+            color: const Color(0xFF2E7D32),
+            bgColor: const Color(0xFFE8F5E9),
+          ),
           const SizedBox(width: 10),
-          _StatCard(icon: Icons.info_outline, label: "Izin", count: izin, color: Colors.orange, bgColor: Colors.orange.shade50),
+          _StatCard(
+            icon: Icons.info_outline,
+            label: "Izin",
+            count: izin,
+            color: Colors.orange,
+            bgColor: Colors.orange.shade50,
+          ),
           const SizedBox(width: 10),
-          _StatCard(icon: Icons.cancel_outlined, label: "Absen", count: tidakHadir, color: Colors.red, bgColor: Colors.red.shade50),
+          _StatCard(
+            icon: Icons.cancel_outlined,
+            label: "Absen",
+            count: tidakHadir,
+            color: Colors.red,
+            bgColor: Colors.red.shade50,
+          ),
           const SizedBox(width: 10),
-          _StatCard(icon: Icons.hourglass_empty, label: "Belum", count: belum, color: Colors.blueGrey, bgColor: Colors.blueGrey.shade50),
+          _StatCard(
+            icon: Icons.hourglass_empty,
+            label: "Belum",
+            count: belum,
+            color: Colors.blueGrey,
+            bgColor: Colors.blueGrey.shade50,
+          ),
         ],
       ),
     );
@@ -469,7 +687,11 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
             child: const Icon(Icons.error_outline, size: 48, color: Colors.red),
           ),
           const SizedBox(height: 16),
-          Text(error!, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600])),
+          Text(
+            error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: loadData,
@@ -487,7 +709,7 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
 
   Widget _buildJamaahList() {
     final list = filteredList;
-    
+
     if (list.isEmpty) {
       return Center(
         child: Column(
@@ -515,8 +737,9 @@ class _InputPresensiPageState extends State<InputPresensiPage> with SingleTicker
           return _JamaahCard(
             jamaah: jamaah,
             sesiAktif: sesiAktif,
-            onHadir: () => _submitPresensi(jamaah.jamaahId, 'Hadir'),
+            onHadir: () => _ambilFotoDanHadir(jamaah.jamaahId),
             onIzin: () => _submitPresensi(jamaah.jamaahId, 'Izin'),
+            onEdit: () => _showEditOptions(jamaah),
           );
         },
       ),
@@ -554,9 +777,16 @@ class _StatCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               "$count",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-            Text(label, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+            Text(
+              label,
+              style: TextStyle(fontSize: 10, color: color.withOpacity(0.8)),
+            ),
           ],
         ),
       ),
@@ -569,29 +799,39 @@ class _JamaahCard extends StatelessWidget {
   final bool sesiAktif;
   final VoidCallback onHadir;
   final VoidCallback onIzin;
+  final VoidCallback onEdit;
 
   const _JamaahCard({
     required this.jamaah,
     required this.sesiAktif,
     required this.onHadir,
     required this.onIzin,
+    required this.onEdit,
   });
 
   Color get _statusColor {
     switch (jamaah.status) {
-      case 'Hadir': return const Color(0xFF2E7D32);
-      case 'Izin': return Colors.orange;
-      case 'Tidak Hadir': return Colors.red;
-      default: return Colors.blueGrey;
+      case 'Hadir':
+        return const Color(0xFF2E7D32);
+      case 'Izin':
+        return Colors.orange;
+      case 'Tidak Hadir':
+        return Colors.red;
+      default:
+        return Colors.blueGrey;
     }
   }
 
   IconData get _statusIcon {
     switch (jamaah.status) {
-      case 'Hadir': return Icons.check_circle;
-      case 'Izin': return Icons.info;
-      case 'Tidak Hadir': return Icons.cancel;
-      default: return Icons.hourglass_empty;
+      case 'Hadir':
+        return Icons.check_circle;
+      case 'Izin':
+        return Icons.info;
+      case 'Tidak Hadir':
+        return Icons.cancel;
+      default:
+        return Icons.hourglass_empty;
     }
   }
 
@@ -605,7 +845,10 @@ class _JamaahCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: isBelum
-            ? Border.all(color: const Color(0xFF2E7D32).withOpacity(0.3), width: 1.5)
+            ? Border.all(
+                color: const Color(0xFF2E7D32).withOpacity(0.3),
+                width: 1.5,
+              )
             : null,
         boxShadow: [
           BoxShadow(
@@ -623,7 +866,10 @@ class _JamaahCard extends StatelessWidget {
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: _statusColor.withOpacity(0.3), width: 2),
+                border: Border.all(
+                  color: _statusColor.withOpacity(0.3),
+                  width: 2,
+                ),
               ),
               child: CircleAvatar(
                 radius: 26,
@@ -633,8 +879,14 @@ class _JamaahCard extends StatelessWidget {
                     : null,
                 child: jamaah.foto == null || jamaah.foto!.isEmpty
                     ? Text(
-                        jamaah.nama.isNotEmpty ? jamaah.nama[0].toUpperCase() : '?',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _statusColor),
+                        jamaah.nama.isNotEmpty
+                            ? jamaah.nama[0].toUpperCase()
+                            : '?',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: _statusColor,
+                        ),
                       )
                     : null,
               ),
@@ -647,13 +899,20 @@ class _JamaahCard extends StatelessWidget {
                 children: [
                   Text(
                     jamaah.nama,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF333333)),
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF333333),
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: _statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
@@ -665,7 +924,11 @@ class _JamaahCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           jamaah.status,
-                          style: TextStyle(fontSize: 11, color: _statusColor, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: _statusColor,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ],
                     ),
@@ -674,22 +937,32 @@ class _JamaahCard extends StatelessWidget {
               ),
             ),
             // Action buttons
-            if (sesiAktif && isBelum) ...[
-              _ActionButton(
-                icon: Icons.check_circle,
-                color: const Color(0xFF2E7D32),
-                bgColor: const Color(0xFFE8F5E9),
-                onTap: onHadir,
-                tooltip: "Hadir",
-              ),
-              const SizedBox(width: 8),
-              _ActionButton(
-                icon: Icons.info_outline,
-                color: Colors.orange,
-                bgColor: Colors.orange.shade50,
-                onTap: onIzin,
-                tooltip: "Izin",
-              ),
+            if (sesiAktif) ...[
+              if (isBelum) ...[
+                _ActionButton(
+                  icon: Icons.check_circle,
+                  color: const Color(0xFF2E7D32),
+                  bgColor: const Color(0xFFE8F5E9),
+                  onTap: onHadir,
+                  tooltip: "Hadir",
+                ),
+                const SizedBox(width: 8),
+                _ActionButton(
+                  icon: Icons.info_outline,
+                  color: Colors.orange,
+                  bgColor: Colors.orange.shade50,
+                  onTap: onIzin,
+                  tooltip: "Izin",
+                ),
+              ] else ...[
+                _ActionButton(
+                  icon: Icons.edit_outlined,
+                  color: Colors.blueAccent,
+                  bgColor: Colors.blue.shade50,
+                  onTap: onEdit,
+                  tooltip: "Ubah Status",
+                ),
+              ],
             ],
           ],
         ),

@@ -205,9 +205,11 @@ function getPresensiDetail() {
     $sesi_id = $_GET['sesi_id'] ?? 0;
     
     // Ambil semua jamaah dengan status presensi di sesi ini
+    // Tambahkan p.foto_bukti
     $sql = "SELECT j.id, j.nama, j.foto, 
             COALESCE(p.status, 'Belum') as status,
-            p.id as presensi_id
+            p.id as presensi_id,
+            p.foto_bukti
             FROM jamaah j
             LEFT JOIN presensi p ON j.id = p.jamaah_id AND p.sesi_id = ?
             ORDER BY j.nama ASC";
@@ -224,7 +226,8 @@ function getPresensiDetail() {
             'nama' => $row['nama'],
             'foto' => $row['foto'],
             'status' => $row['status'],
-            'presensiId' => $row['presensi_id'] ? (int)$row['presensi_id'] : null
+            'presensiId' => $row['presensi_id'] ? (int)$row['presensi_id'] : null,
+            'fotoBukti' => $row['foto_bukti'] // Sertakan foto bukti di response
         ];
     }
     
@@ -292,6 +295,37 @@ function submitPresensi() {
         return;
     }
     
+    // Logic RESET (Hapus data jika status 'Belum')
+    if ($status === 'Belum') {
+        $delete = $conn->prepare("DELETE FROM presensi WHERE sesi_id = ? AND jamaah_id = ?");
+        $delete->bind_param("ii", $sesi_id, $jamaah_id);
+        
+        if ($delete->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Presensi direset']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Gagal reset: ' . $conn->error]);
+        }
+        $delete->close();
+        return;
+    }
+    
+    // Handle File Upload
+    $foto_bukti = null;
+    if (isset($_FILES['foto_bukti']) && $_FILES['foto_bukti']['error'] == 0) {
+        $target_dir = "uploads/";
+        if (!file_exists($target_dir)) {
+            mkdir($target_dir, 0777, true);
+        }
+        
+        $file_extension = pathinfo($_FILES["foto_bukti"]["name"], PATHINFO_EXTENSION);
+        $filename = "bukti_" . $sesi_id . "_" . $jamaah_id . "_" . time() . "." . $file_extension;
+        $target_file = $target_dir . $filename;
+        
+        if (move_uploaded_file($_FILES["foto_bukti"]["tmp_name"], $target_file)) {
+            $foto_bukti = $filename;
+        }
+    }
+    
     // Cek apakah sudah ada presensi di sesi ini
     $check = $conn->prepare("SELECT id FROM presensi WHERE sesi_id = ? AND jamaah_id = ?");
     $check->bind_param("ii", $sesi_id, $jamaah_id);
@@ -301,19 +335,41 @@ function submitPresensi() {
     if ($check_result->num_rows > 0) {
         // Update
         $row = $check_result->fetch_assoc();
-        $stmt = $conn->prepare("UPDATE presensi SET status = ?, waktu = ? WHERE id = ?");
-        $stmt->bind_param("ssi", $status, $waktu, $row['id']);
+        
+        // Build dynamic update query
+        $query = "UPDATE presensi SET status = ?, waktu = ?";
+        $types = "ss";
+        $params = [&$status, &$waktu];
+        
+        if ($foto_bukti) {
+            $query .= ", foto_bukti = ?";
+            $types .= "s";
+            $params[] = &$foto_bukti;
+        }
+        
+        $query .= " WHERE id = ?";
+        $types .= "i";
+        $params[] = &$row['id'];
+        
+        $stmt = $conn->prepare($query);
+        // Bind dynamic params
+        $stmt->bind_param($types, ...$params);
     } else {
         // Insert
-        $stmt = $conn->prepare("INSERT INTO presensi (sesi_id, jamaah_id, status, tanggal, waktu) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("iisss", $sesi_id, $jamaah_id, $status, $tanggal, $waktu);
+        if ($foto_bukti) {
+            $stmt = $conn->prepare("INSERT INTO presensi (sesi_id, jamaah_id, status, tanggal, waktu, foto_bukti) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("iissss", $sesi_id, $jamaah_id, $status, $tanggal, $waktu, $foto_bukti);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO presensi (sesi_id, jamaah_id, status, tanggal, waktu) VALUES (?, ?, ?, ?, ?)");
+            $stmt->bind_param("iisss", $sesi_id, $jamaah_id, $status, $tanggal, $waktu);
+        }
     }
     $check->close();
     
     if ($stmt->execute()) {
         echo json_encode([
             'success' => true,
-            'message' => 'Presensi berhasil disimpan'
+            'message' => 'Presensi berhasil disimpan' . ($foto_bukti ? ' dengan foto' : '')
         ]);
     } else {
         echo json_encode([

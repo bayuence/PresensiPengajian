@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../controllers/presensi_controller.dart';
 import '../../../models/presensi_jamaah.dart';
+import '../../../config/api.dart';
 
 class RekapTable extends StatefulWidget {
   final int sesiId;
@@ -40,8 +41,10 @@ class _RekapTableState extends State<RekapTable> {
     });
 
     try {
-      final data = await PresensiController.fetchPresensiDetail(sesiId: widget.sesiId);
-      
+      final data = await PresensiController.fetchPresensiDetail(
+        sesiId: widget.sesiId,
+      );
+
       if (mounted) {
         setState(() {
           jamaahList = data;
@@ -60,7 +63,8 @@ class _RekapTableState extends State<RekapTable> {
 
   int get totalHadir => jamaahList.where((j) => j.status == 'Hadir').length;
   int get totalIzin => jamaahList.where((j) => j.status == 'Izin').length;
-  int get totalTidakHadir => jamaahList.where((j) => j.status == 'Tidak Hadir').length;
+  int get totalTidakHadir =>
+      jamaahList.where((j) => j.status == 'Tidak Hadir').length;
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +77,14 @@ class _RekapTableState extends State<RekapTable> {
             _buildSummary(),
             Expanded(
               child: loading
-                  ? const Center(child: CircularProgressIndicator(color: _primaryColor))
+                  ? const Center(
+                      child: CircularProgressIndicator(color: _primaryColor),
+                    )
                   : error != null
-                      ? _buildError()
-                      : jamaahList.isEmpty
-                          ? _buildEmpty()
-                          : _buildTable(),
+                  ? _buildError()
+                  : jamaahList.isEmpty
+                  ? _buildEmpty()
+                  : _buildTable(),
             ),
           ],
         ),
@@ -176,14 +182,21 @@ class _RekapTableState extends State<RekapTable> {
                   children: [
                     Text(
                       widget.namaSesi,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
                       widget.tanggal,
-                      style: const TextStyle(fontSize: 13, color: Colors.white70),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
@@ -194,7 +207,11 @@ class _RekapTableState extends State<RekapTable> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.table_chart, color: Colors.white, size: 24),
+                child: const Icon(
+                  Icons.table_chart,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
             ],
           ),
@@ -208,13 +225,21 @@ class _RekapTableState extends State<RekapTable> {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          _SummaryCard(label: "Total", value: jamaahList.length, color: _primaryColor),
+          _SummaryCard(
+            label: "Total",
+            value: jamaahList.length,
+            color: _primaryColor,
+          ),
           const SizedBox(width: 10),
           _SummaryCard(label: "Hadir", value: totalHadir, color: _primaryColor),
           const SizedBox(width: 10),
           _SummaryCard(label: "Izin", value: totalIzin, color: Colors.orange),
           const SizedBox(width: 10),
-          _SummaryCard(label: "Tidak Hadir", value: totalTidakHadir, color: Colors.red),
+          _SummaryCard(
+            label: "Tidak Hadir",
+            value: totalTidakHadir,
+            color: Colors.red,
+          ),
         ],
       ),
     );
@@ -234,7 +259,11 @@ class _RekapTableState extends State<RekapTable> {
             child: const Icon(Icons.error_outline, size: 48, color: Colors.red),
           ),
           const SizedBox(height: 16),
-          Text(error!, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600])),
+          Text(
+            error!,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey[600]),
+          ),
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: _loadData,
@@ -261,12 +290,20 @@ class _RekapTableState extends State<RekapTable> {
               color: _primaryColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.people_outline, size: 56, color: Colors.grey[400]),
+            child: Icon(
+              Icons.people_outline,
+              size: 56,
+              color: Colors.grey[400],
+            ),
           ),
           const SizedBox(height: 20),
           Text(
             "Tidak ada data jamaah",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey[700],
+            ),
           ),
         ],
       ),
@@ -305,21 +342,30 @@ class _RekapTableState extends State<RekapTable> {
                   width: 40,
                   child: Text(
                     "No",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Expanded(
                   flex: 3,
                   child: Text(
                     "Nama Jamaah",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Expanded(
                   flex: 2,
                   child: Text(
                     "Status",
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -334,13 +380,19 @@ class _RekapTableState extends State<RekapTable> {
               itemBuilder: (context, index) {
                 final jamaah = jamaahList[index];
                 final isEven = index % 2 == 0;
-                
+
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: isEven ? Colors.grey.shade50 : Colors.white,
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade200, width: 0.5),
+                      bottom: BorderSide(
+                        color: Colors.grey.shade200,
+                        width: 0.5,
+                      ),
                     ),
                   ),
                   child: Row(
@@ -365,7 +417,52 @@ class _RekapTableState extends State<RekapTable> {
                       ),
                       Expanded(
                         flex: 2,
-                        child: _StatusBadge(status: jamaah.status),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _StatusBadge(status: jamaah.status),
+                            if (jamaah.fotoBukti != null &&
+                                jamaah.fotoBukti!.isNotEmpty) ...[
+                              const SizedBox(width: 8),
+                              InkWell(
+                                onTap: () => _showFoto(jamaah.fotoBukti!),
+                                borderRadius: BorderRadius.circular(8),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Colors.blue.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.image_outlined,
+                                        size: 14,
+                                        color: Colors.blue,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "Foto",
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -377,6 +474,61 @@ class _RekapTableState extends State<RekapTable> {
       ),
     );
   }
+
+  void _showFoto(String filename) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      "${Api.baseUrl}/uploads/$filename",
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: CircularProgressIndicator(),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("Tutup"),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SummaryCard extends StatelessWidget {
@@ -384,7 +536,11 @@ class _SummaryCard extends StatelessWidget {
   final int value;
   final Color color;
 
-  const _SummaryCard({required this.label, required this.value, required this.color});
+  const _SummaryCard({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -400,7 +556,11 @@ class _SummaryCard extends StatelessWidget {
           children: [
             Text(
               "$value",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color),
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
             const SizedBox(height: 2),
             Text(

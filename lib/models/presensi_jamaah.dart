@@ -83,6 +83,7 @@ class PresensiJamaah {
   final String? foto;
   final String status; // 'Belum', 'Hadir', 'Izin', 'Tidak Hadir'
   final int? presensiId;
+  final String? fotoBukti;
 
   PresensiJamaah({
     required this.jamaahId,
@@ -90,6 +91,7 @@ class PresensiJamaah {
     this.foto,
     required this.status,
     this.presensiId,
+    this.fotoBukti,
   });
 
   factory PresensiJamaah.fromJson(Map<String, dynamic> json) {
@@ -99,6 +101,7 @@ class PresensiJamaah {
       foto: json['foto'],
       status: json['status'] ?? 'Belum',
       presensiId: json['presensiId'],
+      fotoBukti: json['fotoBukti'],
     );
   }
 

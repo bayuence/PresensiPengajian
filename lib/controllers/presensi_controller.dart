@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/presensi_jamaah.dart';
 import '../config/api.dart';
@@ -112,28 +113,48 @@ class PresensiController {
     throw Exception("Gagal mengambil detail presensi");
   }
 
-  // POST - Submit presensi (Hadir/Izin)
+  // POST - Submit presensi (Hadir/Izin + Foto Bukti)
   static Future<void> submitPresensi({
     required int sesiId,
     required int jamaahId,
     required String status,
+    File? fotoBukti,
   }) async {
     final now = DateTime.now();
-    final response = await http.post(
-      Uri.parse(Api.presensi),
-      body: {
-        "sesi_id": sesiId.toString(),
-        "jamaah_id": jamaahId.toString(),
-        "status": status,
-        "tanggal": now.toString().substring(0, 10),
-        "waktu":
-            "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}",
-      },
-    );
+    final uri = Uri.parse(Api.presensi);
+    final fields = {
+      "sesi_id": sesiId.toString(),
+      "jamaah_id": jamaahId.toString(),
+      "status": status,
+      "tanggal": now.toString().substring(0, 10),
+      "waktu":
+          "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}",
+    };
 
-    final jsonData = jsonDecode(response.body);
-    if (jsonData['success'] != true) {
-      throw Exception(jsonData['message'] ?? "Gagal menyimpan presensi");
+    if (fotoBukti != null) {
+      // Use MultipartRequest for file upload
+      var request = http.MultipartRequest('POST', uri);
+      request.fields.addAll(fields);
+      request.files.add(
+        await http.MultipartFile.fromPath('foto_bukti', fotoBukti.path),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      final jsonData = jsonDecode(response.body);
+      if (jsonData['success'] != true) {
+        throw Exception(
+          jsonData['message'] ?? "Gagal menyimpan presensi dengan foto",
+        );
+      }
+    } else {
+      // Standard POST if no file
+      final response = await http.post(uri, body: fields);
+      final jsonData = jsonDecode(response.body);
+      if (jsonData['success'] != true) {
+        throw Exception(jsonData['message'] ?? "Gagal menyimpan presensi");
+      }
     }
   }
 
@@ -159,28 +180,36 @@ class PresensiController {
   }) async {
     // Ambil semua sesi dalam periode
     final allSesi = <SesiPresensi>[];
-    
+
     // Jika tidak ada filter, ambil 30 hari terakhir
     final end = endDate != null ? DateTime.parse(endDate) : DateTime.now();
-    final start = startDate != null ? DateTime.parse(startDate) : end.subtract(const Duration(days: 30));
-    
+    final start = startDate != null
+        ? DateTime.parse(startDate)
+        : end.subtract(const Duration(days: 30));
+
     // Ambil data per hari
-    for (var date = start; !date.isAfter(end); date = date.add(const Duration(days: 1))) {
+    for (
+      var date = start;
+      !date.isAfter(end);
+      date = date.add(const Duration(days: 1))
+    ) {
       try {
-        final tanggal = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+        final tanggal =
+            "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
         final sesiList = await fetchSesiList(tanggal: tanggal);
         allSesi.addAll(sesiList);
       } catch (e) {
         // Ignore errors for individual days
       }
     }
-    
+
     // Hitung statistik per jamaah
     final jamaahStats = <int, Map<String, dynamic>>{};
-    
+
     for (var sesi in allSesi) {
-      if (sesi.status != 'selesai') continue; // Hanya hitung sesi yang sudah selesai
-      
+      if (sesi.status != 'selesai')
+        continue; // Hanya hitung sesi yang sudah selesai
+
       try {
         final detail = await fetchPresensiDetail(sesiId: sesi.id);
         for (var item in detail) {
@@ -195,7 +224,7 @@ class PresensiController {
               'tidakHadir': 0,
             };
           }
-          
+
           jamaahStats[item.jamaahId]!['totalSesi']++;
           if (item.status == 'Hadir') {
             jamaahStats[item.jamaahId]!['hadir']++;
@@ -209,11 +238,11 @@ class PresensiController {
         // Ignore errors
       }
     }
-    
+
     // Convert to list and sort by hadir descending
     final result = jamaahStats.values.toList();
     result.sort((a, b) => (b['hadir'] as int).compareTo(a['hadir'] as int));
-    
+
     return result;
   }
 }
